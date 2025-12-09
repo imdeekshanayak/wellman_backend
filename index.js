@@ -1,19 +1,20 @@
 const express = require("express");
-const app  = express();
-PORT = 3000;
+const cors = require("cors");
+const app = express();
 
+const PORT = 3000;
 
+app.use(cors({
+  origin: "*", // you can restrict by domain e.g. "http://localhost:4200"
+  methods: "GET,POST,PUT,DELETE,PATCH",
+  allowedHeaders: "Content-Type, Authorization"
+}));
 
+app.use(express.json());
 
-app.use(express.json())
-
-
-
-require('./app/routes')(app);
 require('./app/config/db.config')(app);
-// require('./middleware/upload.middleware')(app);
+require('./app/routes')(app);
 
-
-app.listen(PORT, ()=>{
-    console.log("hello server is created ")
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
