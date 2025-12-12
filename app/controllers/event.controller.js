@@ -2,7 +2,8 @@ const express = require("express");
 
 const apiRouter = express.Router()
 const NewEvent = require("../models/event.model");
-const upload= require("../middleware/upload.middleware")
+const upload = require("../middleware/cloudinaryUpload")
+// const upload= require("../middleware/upload.middleware")
 const multer = require("multer");
 const path = require("path");
 
