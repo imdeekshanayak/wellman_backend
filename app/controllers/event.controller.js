@@ -4,6 +4,7 @@ const apiRouter = express.Router()
 const NewEvent = require("../models/event.model");
 const upload = require("../middleware/cloudinaryUpload")
 // const upload= require("../middleware/upload.middleware")
+const cloudinary = require("../middleware/cloudinary");
 const multer = require("multer");
 const path = require("path");
 
@@ -21,7 +22,7 @@ module.exports = function(app) {
     const existing = await NewEvent.findOne({ title, eventDate });
     if (existing) {
       return res.status(400).json({
-        message: "An event with this ID already exists!",
+        message: "An event title with this date already exists!",
       });
     }
 
@@ -60,42 +61,54 @@ module.exports = function(app) {
     }
   });
 
-  apiRouter.post("/updateEvent",upload.single("image"), async(req,res) =>{
-     try {
-    const {eventdate,startTime,endTime,address,title} = req.body;
+ apiRouter.post("/updateEvent",upload.single("image"),async (req, res) => {
+    try {
+      const {
+        eventId,
+        eventDate,
+        startTime,
+        endTime,
+        address,
+        title,
+      } = req.body;
 
-    
-    const event = await NewEvent.findOne({ eventId });
-    if (!event) {
-      return res.status(404).json("event not found");
+      // 1️⃣ Find event using eventID
+      const event = await NewEvent.findOne({ eventId });
+      if (!event) {
+        return res.status(404).json({ message: "Event with this id not found" });
+      }
+
+      // 2️⃣ Update fields (only if provided)
+      if (title) event.title = title;
+      if (eventDate) event.eventDate = eventDate;
+      if (startTime) event.startTime = startTime;
+      if (endTime) event.endTime = endTime;
+      if (address) event.address = address;
+
+      // 3️⃣ Image update (Cloudinary)
+      if (req.file) {
+        // delete old image
+        if (event.publicId) {
+          await cloudinary.uploader.destroy(event.publicId);
+        }
+
+        // save new image
+        event.image = req.file.path;        // Cloudinary URL
+        event.publicId = req.file.filename; // Cloudinary public_id
+      }
+
+      // 4️⃣ Save updated event
+      await event.save();
+
+      res.status(200).json({
+        message: "Event updated successfully!",
+        data: event,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-
-    // Update fields
-    if (title) NewEvent.title = title;
-        if (eventdate) NewEvent.eventdate = eventdate;
-
-    if (startTime) NewEvent.startTime = startTime;
-    if (endTime) NewEvent.endTime = endTime;
-    if (address) NewEvent.address = address;
-    if (startTime) NewEvent.startTime = startTime;
-
-    // If new image uploaded
-    if (req.file) {
-      NewEvent.image = req.file.filename;
-    }
-
-    await NewEvent.save();
-
-    res.status(200).json({
-      message: "Event updated successfully!",
-      data: NewEvent,
-    });
-
-  } catch (error) {
-    res.status(500).json(error.message);
   }
-});
+);
 
 
 apiRouter.post("/deleteEvent",async(req,res) =>
