@@ -32,9 +32,11 @@ apiRouter.post("/create-galleryImage", upload.single("imageUrl"), async (req, re
 });
 
 
-  apiRouter.get("/get-galleryImage", async(req,res) =>{
+  apiRouter.post("/get-galleryImage", async(req,res) =>{
     try {
-        const alldata = await newgalleryImages.find();
+            const {galleryEventId} =req.body;
+
+        const alldata = await newgalleryImages.find({galleryEventId});
         res.status(200).json({message:"data fetched successfully",alldata});
     } catch (error) {
         res.status(500).json({message:error.message});
