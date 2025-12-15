@@ -5,6 +5,7 @@ const Newgallery = require("../models/gallery.model");
 const upload = require("../middleware/cloudinaryUpload")
 
 const cloudinary = require("../middleware/cloudinary");
+
 const multer = require("multer");
 const path = require("path");
 
@@ -26,10 +27,10 @@ apiRouter.post("/galleryEvent", upload.single("coverImage"), async (req, res) =>
       });
     }
 
-    // Image handling
+    
     const coverImage = req.file ? req.file.path : "";
 
-    // Save new event
+
     const data = new Newgallery({
       galleryEventId,
       location,
@@ -119,7 +120,8 @@ apiRouter.post("/deleteEvent",async(req,res) =>
     } catch (error) {
         res.status(500).json(error.message);
     }
-})
+});
+
 
 
   
