@@ -9,53 +9,52 @@ const newgalleryImages = require("../models/galleryImages.model");
 const multer = require("multer");
 const path = require("path");
 
-module.exports = function(app){
+module.exports = function (app) {
 
-apiRouter.post("/create-galleryImage", upload.single("imageUrl"), async (req, res) => {
-  try {
-    const { galleryEventId} = req.body;
-
-    const imageUrl = req.file ? req.file.path : "";
-
-    const data = new newgalleryImages(
-      { galleryEventId,imageUrl });
-
-    await data.save();
-
-    res.status(200).json({
-      message: "imageurl added successfully!",
-      data,
-    });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
-
-
-  apiRouter.post("/get-galleryImage", async(req,res) =>{
+  apiRouter.post("/create-galleryImage", upload.single("imageUrl"), async (req, res) => {
     try {
-            const {galleryEventId} =req.body;
+      const { galleryEventId } = req.body;
 
-        const alldata = await newgalleryImages.find({galleryEventId});
-        res.status(200).json({message:"data fetched successfully",alldata});
+      const imageUrl = req.file ? req.file.path : "";
+
+      const data = new newgalleryImages(
+        { galleryEventId, imageUrl });
+
+      await data.save();
+
+      res.status(200).json({
+        message: "imageurl added successfully!",
+        data,
+      });
     } catch (error) {
-        res.status(500).json({message:error.message});
+      res.status(500).json(error);
     }
   });
 
- apiRouter.post("/update-galleryImage",upload.single("imageUrl"),async (req, res) => {
+  apiRouter.post("/get-galleryImage", async (req, res) => {
     try {
-      const  { galleryEventId,imageUrl }= req.body;
+      const { galleryEventId } = req.body;
 
-     
+      const alldata = await newgalleryImages.find({ galleryEventId });
+      res.status(200).json({ message: "data fetched successfully", alldata });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  apiRouter.post("/update-galleryImage", upload.single("imageUrl"), async (req, res) => {
+    try {
+      const { galleryEventId, imageUrl } = req.body;
+
+
       const photos = await newgalleryImages.findOne({ galleryEventId });
       if (!photos) {
         return res.status(404).json({ message: "Folder with this id not found" });
       }
-     
-      
 
-      
+
+
+
       await photos.save();
 
       res.status(200).json({
@@ -66,38 +65,37 @@ apiRouter.post("/create-galleryImage", upload.single("imageUrl"), async (req, re
       res.status(500).json({ message: error.message });
     }
   }
-);
+  );
 
+  apiRouter.post("/delete-galleryImage", async (req, res) => {
+    try {
+      const { imageId } = req.body;
 
-apiRouter.post("/delete-galleryImage", async (req, res) => {
-  try {
-    const { imageId } = req.body;
+      if (!imageId) {
+        return res.status(400).json({ message: "imageId is required" });
+      }
 
-    if (!imageId) {
-      return res.status(400).json({ message: "imageId is required" });
+      const deletedImage = await newgalleryImages.findByIdAndDelete(imageId);
+
+      if (!deletedImage) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      return res.status(200).json({
+        message: "Image deleted successfully",
+        deletedImage
+      });
+
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-    const deletedImage = await newgalleryImages.findByIdAndDelete(imageId);
-
-    if (!deletedImage) {
-      return res.status(404).json({ message: "Image not found" });
-    }
-
-    return res.status(200).json({
-      message: "Image deleted successfully",
-      deletedImage
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+  });
 
 
 
 
 
-    app.use("/",apiRouter);
+  app.use("/", apiRouter);
 }
 
 
