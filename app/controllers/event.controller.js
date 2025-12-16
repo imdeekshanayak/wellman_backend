@@ -115,8 +115,8 @@ apiRouter.post("/deleteEvent",async(req,res) =>
 {
     try {
         const {eventId} =req.body;
-        const event = await NewEvent.findOneAndDelete({eventId});
-
+        const event = await NewEvent.findOneAndDelete({galleryEventId:eventId});
+      console.log("Event Data" ,  event)
 
         if(!event){
             return res.status(200).json({message:"this event does't exist"});
