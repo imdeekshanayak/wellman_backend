@@ -63,13 +63,13 @@ apiRouter.post("/galleryEvent", upload.single("coverImage"), async (req, res) =>
  apiRouter.post("/update-galleryEvent",upload.single("coverImage"),async (req, res) => {
     try {
       const {
-        galleryEventId,
+        eventId,
         location,
         year,
         eventName,
       } = req.body;
 
-     
+     const galleryEventId = eventId;
       const folder = await Newgallery.findOne({ galleryEventId });
       if (!folder) {
         return res.status(404).json({ message: "Folder with this id not found" });
