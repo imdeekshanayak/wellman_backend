@@ -69,18 +69,30 @@ apiRouter.post("/create-galleryImage", upload.single("imageUrl"), async (req, re
 );
 
 
-apiRouter.post("/delete-galleryImage",async(req,res) =>
-{
-    try {
-        const {galleryEventId} =req.body;
-        const image = await newgalleryImages.findOneAndDelete({galleryEventId});
+apiRouter.post("/delete-galleryImage", async (req, res) => {
+  try {
+    const { imageId } = req.body;
 
-
-        return res.status(200).json({message:"image deleted successfully"});
-    } catch (error) {
-        res.status(500).json(error.message);
+    if (!imageId) {
+      return res.status(400).json({ message: "imageId is required" });
     }
+
+    const deletedImage = await newgalleryImages.findByIdAndDelete(imageId);
+
+    if (!deletedImage) {
+      return res.status(404).json({ message: "Image not found" });
+    }
+
+    return res.status(200).json({
+      message: "Image deleted successfully",
+      deletedImage
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
+
 
 
 
