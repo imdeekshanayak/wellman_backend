@@ -7,4 +7,5 @@ require("./controllers/contact.controller")(app);
 require('./controllers/gallery.controller')(app);
 require("./controllers/galleryimage.controller")(app);
 require('./controllers/certification.controller')(app);
+require('./controllers/videos.controller')(app)
 }
