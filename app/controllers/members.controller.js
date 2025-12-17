@@ -2,7 +2,8 @@ const express = require("express");
 
 const apiRouter = express.Router()
 const NewMember = require("../models/members.model");
-// const upload= require("../middleware/upload.middleware")
+const upload = require("../middleware/cloudinaryUpload")
+const cloudinary = require("../middleware/cloudinary");
 
 
 
