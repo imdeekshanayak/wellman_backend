@@ -8,100 +8,125 @@ const NewMember = require("../models/members.model");
 
 module.exports = function(app) {
     
- apiRouter.post("/createMember", async(req,res) =>{
-            try {
-                
-             
-    const {name,email,designation,contactNo} = req.body;
+apiRouter.post("/createMember",upload.single("profileImage"), async (req, res) => {
+    try {
+      const { name, email, designation, contactNo } = req.body;
 
+      if (!name || !email || !designation || !contactNo) {
+        return res.status(400).json({
+          message: "All required fields must be provided"
+        });
+      }
 
-    const existing = await NewMember.findOne({ email });
-        if (existing) {
-          return res.status(400).json({
-            message: "An member with this email already exists!",
-          });
-        }
-    
-        // Generate unique enquiry ID (E.G. ENQ-4829)
-        const memberId = "ENQ-" + Math.floor(1000 + Math.random() * 9000);
+      // Check duplicate email
+      const existing = await NewMember.findOne({ email });
+      if (existing) {
+        return res.status(400).json({
+          message: "A member with this email already exists!"
+        });
+      }
 
-     
+      // Generate unique member ID
+      const memberId = "ENQ-" + Math.floor(1000 + Math.random() * 9000);
 
-   
-    const data = new NewMember({memberId,name,email,designation,contactNo})
-    await data.save();
-    
+      // Get uploaded image path
+      const profileImage = req.file ? req.file.path : "";
 
-    
-    res.status(200).json({message: "Member added successfully!",data});
-  
+      // Save member
+      const data = new NewMember({
+        memberId,
+        name,
+        email,
+        designation,
+        contactNo,
+        profileImage
+      });
+
+      await data.save();
+
+      res.status(200).json({
+        message: "Member added successfully!",
+        data
+      });
+
     } catch (error) {
-        res.status(500).json({message:error.message});
-        console.log(error.message);
+      res.status(500).json({ message: error.message });
+      console.error(error.message);
     }
+  }
+);
 
-  });
-
-  apiRouter.get("/getMember", async(req,res) =>{
+apiRouter.get("/getMember", async(req,res) =>{
     try {
         const alldata = await NewMember.find();
         res.status(200).json({message:"data fetched successfully",alldata});
     } catch (error) {
         res.status(500).json({message:error.message});
     }
-  });
+});
 
-  apiRouter.post("/updateMember", async(req,res) =>{
-     try {
-    const {name,email,designation,contactNo,memberId} = req.body;
+apiRouter.post("/updateMember",upload.single("profileImage"),async (req, res) => {
+    try {
+      const { name, email, designation, contactNo, memberId } = req.body;
 
-    
-    const member = await NewMember.findOne({ memberId });
-    if (!member) {
-      return res.status(404).json("member not found");
+      if (!memberId) {
+        return res.status(400).json({ message: "memberId is required" });
+      }
+
+      const member = await NewMember.findOne({ memberId });
+      if (!member) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+
+      // Update fields only if provided
+      if (name) member.name = name;
+      if (email) member.email = email;
+      if (designation) member.designation = designation;
+      if (contactNo) member.contactNo = contactNo;
+
+      // Update image if uploaded
+      if (req.file) {
+        member.profileImage = req.file.path;
+      }
+
+      await member.save();
+
+      res.status(200).json({
+        message: "Member updated successfully!",
+        data: member
+      });
+
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+);
+
+apiRouter.post("/deleteMember", async (req, res) => {
+  try {
+    const { memberId } = req.body;
+
+    if (!memberId) {
+      return res.status(400).json({ message: "memberId is required" });
     }
 
+    const member = await NewMember.findOneAndDelete({ memberId });
 
-    // Update fields
-    if (name) NewMember.name = name;
-    if (email) NewMember.email = email;
-    if (designation) NewMember.designation = designation;
-    if (contactNo) NewMember.contactNo = contactNo;
-    
+    if (!member) {
+      return res.status(404).json({
+        message: "Member does not exist"
+      });
+    }
 
-    await NewMember.save();
-
-    res.status(200).json({
-      message: "Member updated successfully!",
-      data: NewMember,
+    return res.status(200).json({
+      message: "Member deleted successfully",
+      data: member
     });
 
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ message: error.message });
   }
 });
-
-
-apiRouter.post("/deleteMember",async(req,res) =>
-{
-    try {
-        const {memberId} =req.body;
-        const member = await NewMember.findOneAndDelete({memberId});
-
-
-        if(!member){
-            return res.status(200).json({message:"this member does't exist"});
-        }
-
-        return res.status(200).json({message:"Member deleted successfully"});
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-})
-
-
-  
-
 
     app.use("/",apiRouter);
 }

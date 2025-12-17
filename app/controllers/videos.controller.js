@@ -3,8 +3,6 @@ const apiRouter = express.Router()
 const Videos = require("../models/videos.model");
 // const upload= require("../middleware/upload.middleware")
 
-
-
 module.exports = function (app) {
 
     apiRouter.post("/add-video", async (req, res) => {
@@ -36,56 +34,51 @@ module.exports = function (app) {
         }
     });
 
-
-    apiRouter.post("/update-video", async(req,res) =>{
-     try {
-    const { _id,title,youtubeUrl } = req.body;
-
-    
-    const video = await Videos.findOne({ _id });
-    if (!video) {
-      return res.status(404).json("This video not found");
-    }
+    apiRouter.post("/update-video", async (req, res) => {
+        try {
+            const { _id, title, youtubeUrl } = req.body;
 
 
-    
-    if (title) video.title = title;
-    if (youtubeUrl) video.youtubeUrl = youtubeUrl;
-    
-    
+            const video = await Videos.findOne({ _id });
+            if (!video) {
+                return res.status(404).json("This video not found");
+            }
 
-    await video.save();
 
-    res.status(200).json({
-      message: "data updated successfully!",
-      data: video,
+
+            if (title) video.title = title;
+            if (youtubeUrl) video.youtubeUrl = youtubeUrl;
+
+
+
+            await video.save();
+
+            res.status(200).json({
+                message: "data updated successfully!",
+                data: video,
+            });
+
+        } catch (error) {
+            res.status(500).json(error.message);
+        }
     });
 
-  } catch (error) {
-    res.status(500).json(error.message);
-  }
-});
+    apiRouter.post("/delete-video", async (req, res) => {
+        try {
+            const { _id } = req.body;
+            const video = await Videos.findOneAndDelete({ _id });
 
 
-apiRouter.post("/delete-video",async(req,res) =>
-{
-    try {
-        const { _id } = req.body;
-        const video = await Videos.findOneAndDelete({_id});
+            if (!video) {
+                return res.status(200).json({ message: "this title does't exist" });
+            }
 
-
-        if(!video){
-            return res.status(200).json({message:"this title does't exist"});
+            return res.status(200).json({ message: "video deleted successfully" });
+        } catch (error) {
+            res.status(500).json(error.message);
         }
+    })
 
-        return res.status(200).json({message:"video deleted successfully"});
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-})
-
-
-
-app.use("/",apiRouter);
+    app.use("/", apiRouter);
 
 }
