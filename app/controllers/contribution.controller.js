@@ -53,8 +53,8 @@ module.exports = function (app) {
     try {
       const {
         _id,
-        name
-     
+        name,
+        profileUrl
       } = req.body;
 
       
