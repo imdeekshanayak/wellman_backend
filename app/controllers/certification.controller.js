@@ -55,9 +55,9 @@ module.exports = function(app) {
 
        const {certificateId} =req.body;
         const data = await newcertificates.find({certificateId});
-        res.status(200).json({message:" certificate  data fetched successfully",alldata});
+        res.status(200).json({message:" certificate  data fetched successfully",data});
     } catch (error) {
-        res.status(500).json({message:error.message});
+        res.status(500).json({message:"Invalid Certificate Number!"});
     }
   });
 
