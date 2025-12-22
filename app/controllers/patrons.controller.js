@@ -71,7 +71,7 @@ apiRouter.post("/updatePatrons",upload.single("profileImage"),async (req, res) =
       const { name, email, designation, contactNo, patronId } = req.body;
 
       if (!patronId) {
-        return res.status(400).json({ message: "memberId is required" });
+        return res.status(400).json({ message: "patronId is required" });
       }
 
       const member = await Patrons.findOne({ patronId });
@@ -107,8 +107,8 @@ apiRouter.post("/deletePatrons", async (req, res) => {
   try {
     const { patronId } = req.body;
 
-    if (!memberId) {
-      return res.status(400).json({ message: "memberId is required" });
+    if (!patronId) {
+      return res.status(400).json({ message: "patronId is required" });
     }
 
     const member = await Patrons.findOneAndDelete({ patronId });
