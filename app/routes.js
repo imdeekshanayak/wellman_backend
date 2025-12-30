@@ -10,5 +10,6 @@ require('./controllers/certification.controller')(app);
 require('./controllers/videos.controller')(app);
 require("./controllers/contribution.controller")(app);
 require("./controllers/services.controller")(app);
-require("./controllers/patrons.controller")(app)
+require("./controllers/patrons.controller")(app);
+require("./controllers/payment.controller")(app);
 }

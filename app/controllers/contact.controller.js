@@ -4,6 +4,9 @@ const apiRouter = express.Router()
 const Contact = require("../models/contact.model");
 // const upload= require("../middleware/upload.middleware")
 
+const transporter = require("../utils/mailer");
+
+
 
 
 module.exports = function(app) {
@@ -26,10 +29,24 @@ module.exports = function(app) {
    
     const data = new Contact({firstName,lastName,email,donationTo,message})
     await data.save();
+
+
+    await transporter.sendMail({
+        from: `"Website Contact" <${process.env.MAIL_USER}>`,
+        to: process.env.MAIL_ADMIN, // admin email
+        subject: "New Contact Form Submission",
+        html: `
+          <h3>New Contact Received</h3>
+          <p><b>Name:</b> ${firstName} ${lastName}</p>
+          <p><b>Email:</b> ${email}</p>
+          <p><b>Donation To:</b> ${donationTo}</p>
+          <p><b>Message:</b> ${message}</p>
+        `
+      });
     
 
     
-    res.status(200).json({message: "Contact added successfully!",data});
+    res.status(200).json({message: "Contact added successfully! and sent mail",data});
   
     } catch (error) {
         res.status(500).json({message:error.message});
