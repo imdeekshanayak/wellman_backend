@@ -22,7 +22,7 @@ module.exports = function(app) {
     
  apiRouter.post("/createPayment", async (req, res) => {
   try {
-    const { amountInINR } = req.body; // ₹
+    const { amountInINR,amount,donorEmail,donorName,purpose } = req.body; // ₹
 
     const options = {
       amount: amountInINR * 100, // convert to paise

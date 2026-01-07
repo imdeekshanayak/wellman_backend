@@ -23,7 +23,25 @@ const NewPayment = mongoose.Schema({
        type: String,
       allowNull: true ,
       defaultValue:'success'
+    },
+    purpose:{
+       type: String,
+      allowNull: true 
+      
+    },
+    donorName:{
+       type: String,
+      allowNull: true 
+    },
+    donorEmail:{
+       type: String,
+      allowNull: true 
+    },
+    amount:{
+       type: String,
+      allowNull: true 
     }
+
 },{
         timestamps:true
     }
